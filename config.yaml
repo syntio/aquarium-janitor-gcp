@@ -1,0 +1,43 @@
+topics:
+  invalidTopicJSON: "invalid-topic-json"
+  invalidTopicCSV: "invalid-topic-csv"
+  validTopic: "valid-topic"
+  deadLetterTopic: "dead-letter-topic"
+  inputTopic: "input-topic"
+
+subscriptions:
+  subIdInput: "input-topic-sub"
+  subIdValid: "valid-topic-sub"
+  subIdDeadletter: "deadletter-topic-sub"
+  subIdJSON: "invalid-topic-json-sub"
+  subIdCSV: "invalid-topic-csv-sub"
+
+functions:
+  schemaRegistryURL: ""
+  csvValidatorURL: ""
+  xmlValidatorURL: ""
+  schemaRegistryEvolutionURL: ""
+  pullerCleanerJsonURL: ""
+  pullerCleanerCsvURL: ""
+
+protoparam:
+  tmpFilePath: "/tmp"
+  tmpFileName: "tmp.txt"
+
+pullercleanerjson:
+  timeDurationSeconds: 15
+  maxBatchSize: 4000
+  maxThroughput: 26214400
+
+pullercleanercsv:
+  timeDurationSeconds: 30
+  maxBatchSize: 500
+  maxThroughput: 26214400
+  
+pullerTaskQueue: "schema-registry-puller-queue"
+
+contentType: "application/json"
+
+fileMode: 0644
+
+firebaseCollectionName: "Registry"
