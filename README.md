@@ -225,7 +225,7 @@ Manual deployment of the components, if needed, can be done using the following 
     gcloud scheduler jobs create http puller-cleaner-invoker-json --schedule "* * * * *" --uri=$SCHEDULER_URI --http-method GET
     ```
 
-    where `$SCHEDULER_URI` is the name of the Cloud Function that we want to invoke. The `schedule` parameter is used to set the frequency at which the function will be invoked, specified using the unix-cron format.
+    where `$SCHEDULER_URI` is the name of the Cloud Function that we want to invoke. The `schedule` parameter is used to set the frequency at which the function will be invoked, specified using the unix-cron format. `puller-number` defines how many Cloud Tasks will be created in every Cloud Function invocation. It has been tested with the default value of 10.
 
 ## Usage
 * Message schema registration

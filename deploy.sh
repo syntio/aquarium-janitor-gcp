@@ -148,9 +148,9 @@ export SCHEDULER_URI_JSON=https://$REGION-$PROJECT_ID.cloudfunctions.net/$CF_NAM
 export SCHEDULER_URI_CSV=https://$REGION-$PROJECT_ID.cloudfunctions.net/$CF_NAME_CSV
 
 gcloud scheduler jobs create http puller-cleaner-invoker-json --schedule "* * * * *" \
-	--uri $SCHEDULER_URI_JSON --http-method GET
+	--uri $SCHEDULER_URI_JSON --message-body "{\"puller-number\":10}"
 
 gcloud scheduler jobs create http puller-cleaner-invoker-csv --schedule "* * * * *" \
-	--uri $SCHEDULER_URI_CSV --http-method GET
+	--uri $SCHEDULER_URI_CSV --message-body "{\"puller-number\":10}"
 
 echo "Deployment complete."
