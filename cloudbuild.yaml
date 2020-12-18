@@ -2,10 +2,10 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
-  args: ['deploy.sh']
+  args: ['deploy.sh','322623715180@cloudbuild.gserviceaccount.com']
   env:
   -  'PROJECT_ID=$PROJECT_ID'
   -  'REGION=europe-west3'
   -  'BUCKET_NAME=janitor'
   -  'CONFIG_FILE=config.yaml'
-timeout: 5000s
+  timeout: 5000s

@@ -20,6 +20,8 @@ export PATH=$PATH:/usr/local/go/bin
 GO111MODULE=on go get github.com/mikefarah/yq/v3
 export PATH=$PATH:/builder/home/go/bin
 
+
+
 # Parse the configuration file and get the config values
 echo "Parsing the configuration file.."
 INPUT_TOPIC=$(yq r $CONFIG_FILE topics.inputTopic)
@@ -34,23 +36,26 @@ INVALID_SUB_JSON=$(yq r $CONFIG_FILE subscriptions.subIdJSON)
 INVALID_SUB_CSV=$(yq r $CONFIG_FILE subscriptions.subIdCSV)
 DEADLETTER_SUB=$(yq r $CONFIG_FILE subscriptions.subIdDeadletter)
 
-echo "Input_topic: " $INPUT_TOPIC
-echo "Valid_topic: " $VALID_TOPIC
-echo "Invalid_topic_JSON: " $INVALID_TOPIC_JSON
-echo "Invalid_topic_CSV: " $INVALID_TOPIC_CSV
-echo "Deadletter_topic: " $DEADLETTER_TOPIC
-echo "Input_sub: " $INPUT_SUB
-echo "Valid_sub: " $VALID_SUB
-echo "Invalid_sub_JSON: " $INVALID_SUB_JSON
-echo "Invalid_sub_CSV: " $INVALID_SUB_CSV
-echo "Deadletter_sub: " $DEADLETTER_SUB
+echo "Topic for input messages: " $INPUT_TOPIC
+echo "Topic for valid messages: " $VALID_TOPIC
+echo "Topic for invalid JSON messages: " $INVALID_TOPIC_JSON
+echo "Topic for invalid CSV messages: " $INVALID_TOPIC_CSV
+echo "Topic for deadletter messages: " $DEADLETTER_TOPIC
+echo "Subscription for input topic: " $INPUT_SUB
+echo "Subscription for valid topic: " $VALID_SUB
+echo "Subscription for invalid JSON topic: " $INVALID_SUB_JSON
+echo "Subscription for invalid CSV topic: " $INVALID_SUB_CSV
+echo "Subscription for deadletter topic: " $DEADLETTER_SUB
 
 # Create a bucket for configuration file storing
 echo "Creating the storage bucket.."
-gsutil mb -l $REGION gs://$BUCKET_NAME
+gsutil mb -l $REGION gs://$PROJECT_ID-$BUCKET_NAME
 
 echo "Storing the configuration file on GCP bucket.."
-gsutil cp $CONFIG_FILE gs://$BUCKET_NAME
+gsutil cp $CONFIG_FILE gs://$PROJECT_ID-$BUCKET_NAME
+
+echo "Storing key.json on GCP bucket.."
+gsutil cp $PWD/key.json gs://$PROJECT_ID-$BUCKET_NAME 
 
 # Create the topics:
 # - input topic: the entry point for all the messages
@@ -74,19 +79,25 @@ gcloud pubsub subscriptions create $DEADLETTER_SUB --topic $DEADLETTER_TOPIC
 echo "Creating Firebase data store.."
 gcloud firestore databases create --region $REGION
 
+temp=$(gcloud iam service-accounts list | grep firebase-admin)
+tempList=$(temp)
+firebaseIAM=${tempList[1]}
+echo $firebaseIAM
+gcloud iam service-accounts keys create $PWD/key.json --iam-account=$firebaseIAM
+
 # Create .zip source files for Cloud Functions
 echo "Creating .zip source files.."
 cd central-consumer;
 zip -r ../central-consumer.zip *
-cd ../puller-cleaner/uc2-puller-cleaner-in-one-json;
+cd ../puller-cleaner/puller-cleaner-json;
 zip -r /workspace/puller-cleaner-json.zip *
-cd ../uc2-puller-cleaner-in-one-csv
+cd ../puller-cleaner-csv;
 zip -r /workspace/puller-cleaner-csv.zip *
-cd /workspace/puller-tasks/uc2-puller-tasks-json
+cd  ../../puller-tasks/puller-tasks-json;
 zip -r /workspace/puller-tasks-json.zip *
-cd ../uc2-puller-tasks-csv
+cd ../puller-tasks-csv
 zip -r /workspace/puller-tasks-csv.zip *
-cd /workspace/helper-functions/xml-validator
+cd ../../helper-functions/xml-validator;
 zip -r /workspace/xml-validator.zip *
 cd ../csv-validator
 zip -r /workspace/csv-validator.zip *
@@ -97,7 +108,7 @@ cd /workspace
 echo "Uploading Cloud Functions source code to storage.."
 for zip in `find . -iname \*.zip`
 do
-	gsutil cp $zip gs://$BUCKET_NAME
+	gsutil cp $zip gs://$PROJECT_ID-$BUCKET_NAME
 done
 
 cd schema-registry
@@ -108,33 +119,33 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/schema-registry
 
 # Deploy the created image to Cloud Run
 echo "Deploying the created image to Cloud Run.."
-gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE, FIREBASE_CREDENTIALS_NAME=$PWD/key.json
 
 cd ..
 
 # Deploy the Central Consumer to Cloud Functions
 echo "Deploying the Central Consumer component.."
-gcloud functions deploy central-consumer --runtime go113 --entry-point CentralConsumerHandler --source=gs://$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy central-consumer --runtime go113 --entry-point CentralConsumerHandler --source=gs://$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the Puller & Cleaner (JSON and CSV) to Cloud Functions
 echo "Deploying the Puller & Cleaner component.."
-gcloud functions deploy puller-cleaner-json --runtime go113 --entry-point PullMsgsSync --source=gs://$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-cleaner-json --runtime go113 --entry-point PullMsgsSync --source=gs://$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
-gcloud functions deploy puller-cleaner-csv --runtime go113 --entry-point PullMsgsSync --source=gs://$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-cleaner-csv --runtime go113 --entry-point PullMsgsSync --source=gs://$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the function that creates Cloud Tasks to invoke Cloud Functions
 echo "Deploying the Puller Tasks functions.."
 
-gcloud functions deploy puller-tasks-json --runtime go113 --entry-point HTTPPullerTasks --source=gs://$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-tasks-json --runtime go113 --entry-point HTTPPullerTasks --source=gs://$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
-gcloud functions deploy puller-tasks-csv --runtime go113 --entry-point HTTPPullerTasks --source=gs://$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-tasks-csv --runtime go113 --entry-point HTTPPullerTasks --source=gs://$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the helper functions for XML and CSV validation
 echo "Deploying the helper Cloud Functions.."
 
-gcloud functions deploy xml-validator --runtime python37 --entry-point http_validation_handler --source=gs://$BUCKET_NAME/xml-validator.zip --trigger-http --region $REGION 
+gcloud functions deploy xml-validator --runtime python37 --entry-point http_validation_handler --source=gs://$PROJECT_ID-$BUCKET_NAME/xml-validator.zip --trigger-http --region $REGION 
 
-gcloud functions deploy csv-validator --runtime java11 --entry-point hr.syntio.handler.HttpHandler --source=gs://$BUCKET_NAME/csv-validator.zip --trigger-http --region $REGION
+gcloud functions deploy csv-validator --runtime java11 --entry-point hr.syntio.handler.HttpHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/csv-validator.zip --trigger-http --region $REGION
 
 # Create Cloud Tasks queue
 echo "Creating Cloud Tasks Queue.."
@@ -153,4 +164,4 @@ gcloud scheduler jobs create http puller-cleaner-invoker-json --schedule "* * * 
 gcloud scheduler jobs create http puller-cleaner-invoker-csv --schedule "* * * * *" \
 	--uri $SCHEDULER_URI_CSV --http-method GET
 
-echo "Deployment complete."
+echo "Deployment complete :)"
