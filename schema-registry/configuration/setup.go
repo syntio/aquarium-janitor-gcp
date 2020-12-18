@@ -63,40 +63,38 @@ type Config struct {
 }
 
 // Function for obtaining configuration parameters values into an object.
-func RetrieveConfig() (cfg Config) error {
-	bucketName := os.Getenv("BUCKET_NAME") //bucketName := "testing_centralconsumer_srnd107"
-	fileName := os.Getenv("CONFIG_FILE")   //configFileName := "config.yaml"
+func RetrieveConfig() (cfg Config) {
+	bucketName := os.Getenv("BUCKET_NAME")
+	fileName := os.Getenv("CONFIG_FILE")
 
-	fileContent, err := ReadFromBucket(bucketName, fileName)
-	if err != nil {
-		return cfg, err
-	}
+	fileContent := ReadFromBucket(bucketName, fileName)
 
 	if err := yaml.Unmarshal(fileContent, &cfg); err != nil {
-		return cfg, fmt.Errorf("ERROR: Configuration object can't be obtained from storage. %v", err)
+		log.Printf("ERROR: Configuration object can't be obtained from storage. %v.\n", err)
 	}
-
-	return cfg, nil
+	return cfg
 }
 
 func ReadFromBucket(bucketName string, fileName string) []byte {
 	ctx := context.Background()
 
+	//using cloud function
 	client, err := storage.NewClient(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("ERROR: Couldn't connect to GCS. %v", err)
+		log.Println(err)
+		return nil
 	}
 
 	rc, err := client.Bucket(bucketName).Object(fileName).NewReader(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("ERROR: Reader from cloud storage can't be obtained. Check environment variables. %v", err)
+		log.Printf("ERROR: Reader from cloud storage can't be obtained. Check environment variables. %v.\n", err)
+		return nil
 	}
-
 	slurp, err := ioutil.ReadAll(rc)
 	rc.Close()
 	if err != nil {
-		return nil, fmt.Errorf("ERROR: Storage object is not valid. %v", err)
+		log.Printf("ERROR: Storage object is not valid. %v.\n", err)
+		return nil
 	}
-
-	return slurp, nil
+	return slurp
 }
