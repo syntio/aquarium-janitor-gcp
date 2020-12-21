@@ -8,4 +8,4 @@ steps:
   -  'REGION=europe-west3'
   -  'BUCKET_NAME=janitor'
   -  'CONFIG_FILE=config.yaml'
-  timeout: 5000s
+  timeout: 60000s

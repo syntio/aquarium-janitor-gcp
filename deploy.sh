@@ -54,9 +54,6 @@ gsutil mb -l $REGION gs://$PROJECT_ID-$BUCKET_NAME
 echo "Storing the configuration file on GCP bucket.."
 gsutil cp $CONFIG_FILE gs://$PROJECT_ID-$BUCKET_NAME
 
-echo "Storing key.json on GCP bucket.."
-gsutil cp $PWD/key.json gs://$PROJECT_ID-$BUCKET_NAME 
-
 # Create the topics:
 # - input topic: the entry point for all the messages
 # - valid_topic: topic for messages with valid schemas
@@ -77,14 +74,16 @@ gcloud pubsub subscriptions create $DEADLETTER_SUB --topic $DEADLETTER_TOPIC
 
 # Create the Firebase data store for schema information storing
 echo "Creating Firebase data store.."
-gcloud firestore databases create --region $REGION
+gcloud alpha firestore databases create --region=$REGION --project=$PROJECT_ID
 
-temp=$(gcloud iam service-accounts list | grep firebase-admin)
-tempList=$(temp)
+temp=$(gcloud iam service-accounts list | grep "firebase-admin")
+tempList=($temp)
 firebaseIAM=${tempList[1]}
 echo $firebaseIAM
 gcloud iam service-accounts keys create $PWD/key.json --iam-account=$firebaseIAM
 
+echo "Stroing the iam key on the GCP bucket"
+gsutil cp $PWD/key.json gs://$PROJECT_ID-$BUCKET_NAME
 # Create .zip source files for Cloud Functions
 echo "Creating .zip source files.."
 cd central-consumer;
@@ -119,26 +118,26 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/schema-registry
 
 # Deploy the created image to Cloud Run
 echo "Deploying the created image to Cloud Run.."
-gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE, FIREBASE_CREDENTIALS_NAME=$PWD/key.json
+gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,FIREBASE_CREDENTIALS_NAME=key.json
 
 cd ..
 
 # Deploy the Central Consumer to Cloud Functions
 echo "Deploying the Central Consumer component.."
-gcloud functions deploy central-consumer --runtime go113 --entry-point CentralConsumerHandler --source=gs://$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy central-consumer --runtime go113 --entry-point CentralConsumerHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the Puller & Cleaner (JSON and CSV) to Cloud Functions
 echo "Deploying the Puller & Cleaner component.."
-gcloud functions deploy puller-cleaner-json --runtime go113 --entry-point PullMsgsSync --source=gs://$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-cleaner-json --runtime go113 --timeout=540s --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
-gcloud functions deploy puller-cleaner-csv --runtime go113 --entry-point PullMsgsSync --source=gs://$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the function that creates Cloud Tasks to invoke Cloud Functions
 echo "Deploying the Puller Tasks functions.."
 
-gcloud functions deploy puller-tasks-json --runtime go113 --entry-point HTTPPullerTasks --source=gs://$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-tasks-json --runtime go113 --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
-gcloud functions deploy puller-tasks-csv --runtime go113 --entry-point HTTPPullerTasks --source=gs://$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-tasks-csv --runtime go113 --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the helper functions for XML and CSV validation
 echo "Deploying the helper Cloud Functions.."
