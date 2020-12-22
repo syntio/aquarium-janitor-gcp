@@ -2,7 +2,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
-  args: ['deploy.sh','322623715180@cloudbuild.gserviceaccount.com']
+  args: ['deploy.sh']
   env:
   -  'PROJECT_ID=$PROJECT_ID'
   -  'REGION=europe-west3'
