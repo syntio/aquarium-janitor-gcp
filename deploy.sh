@@ -142,9 +142,9 @@ gcloud functions deploy puller-tasks-csv --runtime go113 --timeout=540s --allow-
 # Deploy the helper functions for XML and CSV validation
 echo "Deploying the helper Cloud Functions.."
 
-gcloud functions deploy xml-validator --runtime python37 --timeout=540s --entry-point http_validation_handler --source=gs://$PROJECT_ID-$BUCKET_NAME/xml-validator.zip --trigger-http --region $REGION
+gcloud functions deploy xml-validator --runtime python37 --timeout=540s --allow-unauthenticated --entry-point http_validation_handler --source=gs://$PROJECT_ID-$BUCKET_NAME/xml-validator.zip --trigger-http --region $REGION
 
-gcloud functions deploy csv-validator --runtime java11 --timeout=540s --entry-point hr.syntio.handler.HttpHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/csv-validator.zip --trigger-http --region $REGION
+gcloud functions deploy csv-validator --runtime java11 --timeout=540 --allow-unauthenticated --entry-point hr.syntio.handler.HttpHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/csv-validator.zip --trigger-http --region $REGION
 
 # Create Cloud Tasks queue
 echo "Creating Cloud Tasks Queue.."
