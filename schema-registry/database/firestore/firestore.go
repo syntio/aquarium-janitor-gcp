@@ -44,9 +44,8 @@ func init() {
 	bucket := os.Getenv("BUCKET_NAME")
 	json := configuration.ReadFromBucket(bucket, credFilename)
 	option := option.WithCredentialsJSON(json)
-
-	conf := &firebase.Config{ProjectID: "syntio-schema-evolution"}
-
+	projectId := os.Getenv("PROJECT_ID")
+	conf := &firebase.Config{ProjectID:projectId}
 	app, err := firebase.NewApp(ctx, conf, option)
 	if err != nil {
 		log.Fatalf("Firestore setup error. Server can't start properly.\nError: %s", err)
