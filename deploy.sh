@@ -135,9 +135,9 @@ gcloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --allo
 # Deploy the function that creates Cloud Tasks to invoke Cloud Functions
 echo "Deploying the Puller Tasks functions.."
 
-gcloud functions deploy puller-tasks-json --runtime go113 --timeout=540s --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-tasks-json --runtime go113 --timeout=540s --allow-unauthenticated --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
-gcloud functions deploy puller-tasks-csv --runtime go113 --timeout=540s --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-tasks-csv --runtime go113 --timeout=540s --allow-unauthenticated --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the helper functions for XML and CSV validation
 echo "Deploying the helper Cloud Functions.."
