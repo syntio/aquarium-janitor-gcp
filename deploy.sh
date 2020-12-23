@@ -118,19 +118,19 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/schema-registry
 
 # Deploy the created image to Cloud Run
 echo "Deploying the created image to Cloud Run.."
-gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,FIREBASE_CREDENTIALS_NAME=key.json
+gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --allow-unauthenticated --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,FIREBASE_CREDENTIALS_NAME=key.json
 
 cd ..
 
 # Deploy the Central Consumer to Cloud Functions
 echo "Deploying the Central Consumer component.."
-gcloud functions deploy central-consumer --runtime go113 --timeout=540s --entry-point CentralConsumerHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy central-consumer --runtime go113 --timeout=540s --allow-unauthenticated --entry-point CentralConsumerHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the Puller & Cleaner (JSON and CSV) to Cloud Functions
 echo "Deploying the Puller & Cleaner component.."
-gcloud functions deploy puller-cleaner-json --runtime go113 --timeout=540s --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-cleaner-json --runtime go113 --timeout=540s --allow-unauthenticated --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
-cloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
+gcloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --allow-unauthenticated --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 # Deploy the function that creates Cloud Tasks to invoke Cloud Functions
 echo "Deploying the Puller Tasks functions.."
