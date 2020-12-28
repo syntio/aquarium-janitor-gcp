@@ -34,7 +34,7 @@ func init() {
 	cfg := configuration.RetrieveConfig()
 
 	databaseExecutor = &firestore.FirestoreDB{
-		Collection: cfg.FirebaseCollectionName,
+		Collection: cfg.FirestoreCollectionName,
 	}
 }
 

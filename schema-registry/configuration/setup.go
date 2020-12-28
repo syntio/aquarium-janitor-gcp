@@ -72,9 +72,9 @@ type Config struct {
 		LoggingEnabled           bool          `yaml:"loggingEnabled"`
 	} `yaml:"pullercleanercsv"`
 
-	ContentType            string      `yaml:"contentType"`
-	FileMode               os.FileMode `yaml:"fileMode"`
-	FirebaseCollectionName string      `yaml:"firebaseCollectionName"`
+	ContentType             string      `yaml:"contentType"`
+	FileMode                os.FileMode `yaml:"fileMode"`
+	FirestoreCollectionName string      `yaml:"firebaseCollectionName"`
 }
 
 // Function for obtaining configuration parameters values into an object.
