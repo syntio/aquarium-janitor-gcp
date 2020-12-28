@@ -72,8 +72,8 @@ gcloud pubsub subscriptions create $INVALID_SUB_JSON --topic $INVALID_TOPIC_JSON
 gcloud pubsub subscriptions create $INVALID_SUB_CSV --topic $INVALID_TOPIC_CSV
 gcloud pubsub subscriptions create $DEADLETTER_SUB --topic $DEADLETTER_TOPIC
 
-# Create the Firebase data store for schema information storing
-echo "Creating Firebase data store.."
+# Create the Firestore data store for schema information storing
+echo "Creating Firestore data store.."
 gcloud alpha firestore databases create --region=$REGION --project=$PROJECT_ID
 
 temp=$(gcloud iam service-accounts list | grep "firebase-admin")

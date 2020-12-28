@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go v0.67.0 // indirect
 	cloud.google.com/go/firestore v1.3.0
 	cloud.google.com/go/storage v1.12.0
-	firebase.google.com/go v3.13.0+incompatible
 	github.com/gorilla/mux v1.8.0
 	go.mongodb.org/mongo-driver v1.4.2
 	golang.org/x/net v0.0.0-20200930145003-4acb6c075d10 // indirect

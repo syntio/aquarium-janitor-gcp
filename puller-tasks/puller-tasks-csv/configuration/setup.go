@@ -61,20 +61,20 @@ type Config struct {
 
 	PullerCleanerJSON struct {
 		TimeDurationSeconds time.Duration `yaml:"timeDurationSeconds"`
-		MaxBatchSize             int           `yaml:"maxBatchSize"`
-		MaxThroughput            int           `yaml:"maxThroughput"`
+		MaxBatchSize        int           `yaml:"maxBatchSize"`
+		MaxThroughput       int           `yaml:"maxThroughput"`
 	} `yaml:"pullercleanerjson"`
 
 	PullerCleanerCSV struct {
 		TimeDurationSeconds time.Duration `yaml:"timeDurationSeconds"`
-		MaxBatchSize             int           `yaml:"maxBatchSize"`
-		MaxThroughput            int           `yaml:"maxThroughput"`
+		MaxBatchSize        int           `yaml:"maxBatchSize"`
+		MaxThroughput       int           `yaml:"maxThroughput"`
 	} `yaml:"pullercleanercsv"`
 
 	PullerTaskQueue        string      `yaml:"pullerTaskQueue"`
 	ContentType            string      `yaml:"contentType"`
 	FileMode               os.FileMode `yaml:"fileMode"`
-	FirebaseCollectionName string      `yaml:"firebaseCollectionName"`
+	FirestoreCollectionName string      `yaml:"firestoreCollectionName`
 }
 
 // RetrieveConfig obtains configuration parameters from a

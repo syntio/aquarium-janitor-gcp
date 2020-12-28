@@ -74,7 +74,7 @@ type Config struct {
 
 	ContentType             string      `yaml:"contentType"`
 	FileMode                os.FileMode `yaml:"fileMode"`
-	FirestoreCollectionName string      `yaml:"firebaseCollectionName"`
+	FirestoreCollectionName string      `yaml:"firestoreCollectionName"`
 }
 
 // Function for obtaining configuration parameters values into an object.
