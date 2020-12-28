@@ -20,7 +20,6 @@ import (
 	"os"
 
 	"cloud.google.com/go/firestore"
-	firebase "firebase.google.com/go"
 	"github.com/syntio/schema-registry/configuration"
 	"github.com/syntio/schema-registry/model"
 	"github.com/syntio/schema-registry/model/dto"
@@ -40,23 +39,16 @@ var client *firestore.Client
 
 func init() {
 	ctx := context.Background()
-	credFilename := os.Getenv("FIREBASE_CREDENTIALS_NAME")
+	credFilename := os.Getenv("SERVICE_ACCOUNT_KEY_FILE")
 	bucket := os.Getenv("BUCKET_NAME")
 	json := configuration.ReadFromBucket(bucket, credFilename)
 	option := option.WithCredentialsJSON(json)
 	projectId := os.Getenv("PROJECT_ID")
-	conf := &firebase.Config{ProjectID:projectId}
-	app, err := firebase.NewApp(ctx, conf, option)
-	if err != nil {
-		log.Fatalf("Firestore setup error. Server can't start properly.\nError: %s", err)
+	var initErr error
+	client, initErr = firestore.NewClient(ctx, projectId, option)
+	if initErr != nil {
+		log.Fatalf("Firestore client initialization failed. Server can't start properly.\nError: %s", initErr)
 	}
-
-	handler, err := app.Firestore(ctx)
-	if err != nil {
-		log.Fatalf("Firestore client initialization failed. Server can't start properly.\nError: %s", err)
-	}
-
-	client = handler
 }
 
 // GetSchemaByIdAndVersion retrieves a schema by its id and version. Method returns a boolean flag which defines

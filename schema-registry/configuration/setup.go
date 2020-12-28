@@ -49,6 +49,8 @@ type Config struct {
 		CsvValidatorURL            string `yaml:"csvValidatorURL"`
 		XmlValidatorURL            string `yaml:"xmlValidatorURL"`
 		SchemaRegistryEvolutionURL string `yaml:"schemaRegistryEvolutionURL"`
+		PullerCleanerJsonURL       string `yaml:"pullerCleanerJsonURL"`
+		PullerCleanerCsvURL        string `yaml:"pullerCleanerCsvURL"`
 	} `yaml:"functions"`
 
 	Protoparam struct {
@@ -70,9 +72,9 @@ type Config struct {
 		LoggingEnabled           bool          `yaml:"loggingEnabled"`
 	} `yaml:"pullercleanercsv"`
 
-	ContentType            string      `yaml:"contentType"`
-	FileMode               os.FileMode `yaml:"fileMode"`
-	FirebaseCollectionName string      `yaml:"firebaseCollectionName"`
+	ContentType             string      `yaml:"contentType"`
+	FileMode                os.FileMode `yaml:"fileMode"`
+	FirestoreCollectionName string      `yaml:"firestoreCollectionName"`
 }
 
 // Function for obtaining configuration parameters values into an object.
