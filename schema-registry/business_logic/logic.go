@@ -70,7 +70,7 @@ func CreateSchema(ctx context.Context, schemaInfoDTO dto.SchemaDTO) ([]byte, err
 	if added {
 		message = "New Schema added"
 	} else {
-		message = "Shcema already exists in the registry"
+		message = "Schema already exists in the registry"
 	}
 
 	response := util.MapToResponse(insertInfo, message)

@@ -49,6 +49,8 @@ type Config struct {
 		CsvValidatorURL            string `yaml:"csvValidatorURL"`
 		XmlValidatorURL            string `yaml:"xmlValidatorURL"`
 		SchemaRegistryEvolutionURL string `yaml:"schemaRegistryEvolutionURL"`
+		PullerCleanerJsonURL       string `yaml:"pullerCleanerJsonURL"`
+		PullerCleanerCsvURL        string `yaml:"pullerCleanerCsvURL"`
 	} `yaml:"functions"`
 
 	Protoparam struct {
