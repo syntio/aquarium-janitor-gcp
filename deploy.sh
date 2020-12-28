@@ -76,11 +76,11 @@ gcloud pubsub subscriptions create $DEADLETTER_SUB --topic $DEADLETTER_TOPIC
 echo "Creating Firebase data store.."
 gcloud alpha firestore databases create --region=$REGION --project=$PROJECT_ID
 
-temp=$(gcloud iam service-accounts list | grep "firebase-admin")
+temp=$(gcloud iam service-accounts list | grep $PROJECT_ID@appspot.gserviceaccount.com)
 tempList=($temp)
-firebaseIAM=${tempList[1]}
-echo $firebaseIAM
-gcloud iam service-accounts keys create $PWD/key.json --iam-account=$firebaseIAM
+AppServiceAccount=${tempList[5]}
+echo $AppServiceAccount
+gcloud iam service-accounts keys create $PWD/key.json --iam-account=$AppServiceAccount
 
 echo "Stroing the iam key on the GCP bucket"
 gsutil cp $PWD/key.json gs://$PROJECT_ID-$BUCKET_NAME
@@ -118,7 +118,7 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/schema-registry
 
 # Deploy the created image to Cloud Run
 echo "Deploying the created image to Cloud Run.."
-gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --allow-unauthenticated --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,FIREBASE_CREDENTIALS_NAME=key.json
+gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --allow-unauthenticated --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,SERVICE_ACCOUNT_KEY_FILE=key.json
 
 cd ..
 
