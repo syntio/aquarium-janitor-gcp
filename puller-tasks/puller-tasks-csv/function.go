@@ -33,7 +33,7 @@ var region string
 
 var Cfg configuration.Config
 
-var pullerCleanerURL string
+var pullerCleanerURL string = os.Getenv("PULLER_CLEANER_CSV_URL")
 var pullerTaskQueue string
 
 type Request struct {
@@ -60,7 +60,6 @@ func init() {
 		return
 	}
 
-	pullerCleanerURL = Cfg.Functions.PullerCleanerCsvURL
 	pullerTaskQueue = Cfg.PullerTaskQueue
 }
 

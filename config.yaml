@@ -40,4 +40,4 @@ contentType: "application/json"
 
 fileMode: 0644
 
-firebaseCollectionName: "Registry"
+firestoreCollectionName: "Registry"

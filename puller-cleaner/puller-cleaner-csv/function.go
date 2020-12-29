@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-// Package puller_cleaner_csv contains the main function. 
-// This component is suited for the use case in which there is an unexpected change in the messages sent. 
+// Package puller_cleaner_csv contains the main function.
+// This component is suited for the use case in which there is an unexpected change in the messages sent.
 // This repository implements the component as a GCP Cloud function.
 package puller_cleaner_csv
 
@@ -45,13 +44,16 @@ var timeDurationSeconds time.Duration
 var maxBatchSize int
 var maxThroughput int
 
-var schemaRegistryURL string
-var schemaRegistryEvolutionURL string
 var contentType string
 
-var csvValidatorURL string
+var csvValidatorURL string = os.Getenv("CSV_VALIDATOR_URL")
+var schemaRegistryURL string = os.Getenv("SCHEMA_REGISTRY_URL")
 
-func init(){
+const resourcePath string = "/schema/%s/evolution"
+
+var schemaRegistryEvolutionURL string = schemaRegistryURL + resourcePath
+
+func init() {
 	projectID = os.Getenv("PROJECT_ID")
 	if projectID == "" {
 		log.Printf("ERROR: Couldn't read PROJECT_ID environment variable.")
@@ -80,11 +82,11 @@ func init(){
 	csvValidatorURL = Cfg.Functions.CsvValidatorURL
 }
 
-// PullerCleaner is the main function. 
-// It pulls messages from the topic of CSV invalid messages 
+// PullerCleaner is the main function.
+// It pulls messages from the topic of CSV invalid messages
 // and tries to clean them using the Schema Registry system.
 //
-// Input paramaters are http.ResponseWriter and http.Request 
+// Input paramaters are http.ResponseWriter and http.Request
 // because of the HTTP trigger on Cloud Function.
 func PullerCleaner(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -96,14 +98,14 @@ func PullerCleaner(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Print(err)
 		}
-		
+
 		log.Printf("Pulled 0 messages.")
 		return
 	}
 	log.Printf("Pulled %d messages!", length)
 
 	// Clean messages
-	cleaner.Clean(ctx, msgs, projectID, validTopic, invalidTopicJSON, deadLetterTopic, 
+	cleaner.Clean(ctx, msgs, projectID, validTopic, invalidTopicJSON, deadLetterTopic,
 		schemaRegistryURL, schemaRegistryEvolutionURL, contentType, csvValidatorURL)
 
 	fmt.Fprint(w, "Finished execution")
