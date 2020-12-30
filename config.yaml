@@ -12,14 +12,6 @@ subscriptions:
   subIdJSON: "invalid-topic-json-sub"
   subIdCSV: "invalid-topic-csv-sub"
 
-functions:
-  schemaRegistryURL: ""
-  csvValidatorURL: ""
-  xmlValidatorURL: ""
-  schemaRegistryEvolutionURL: ""
-  pullerCleanerJsonURL: ""
-  pullerCleanerCsvURL: ""
-
 protoparam:
   tmpFilePath: "/tmp"
   tmpFileName: "tmp.txt"
