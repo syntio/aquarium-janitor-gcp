@@ -17,11 +17,12 @@ package configuration
 
 import (
 	"context"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"gopkg.in/yaml.v3"
 
 	"cloud.google.com/go/storage"
 )
@@ -70,10 +71,10 @@ type Config struct {
 		MaxThroughput       int           `yaml:"maxThroughput"`
 	} `yaml:"pullercleanercsv"`
 
-	PullerCleanerTaskQueue string      `yaml:"pullerCleanerTaskQueue"`
-	ContentType            string      `yaml:"contentType"`
-	FileMode               os.FileMode `yaml:"fileMode"`
-	FirebaseCollectionName string      `yaml:"firebaseCollectionName"`
+	PullerCleanerTaskQueue  string      `yaml:"pullerCleanerTaskQueue"`
+	ContentType             string      `yaml:"contentType"`
+	FileMode                os.FileMode `yaml:"fileMode"`
+	FirestoreCollectionName string      `yaml:"firestoreCollectionName"`
 }
 
 // RetrieveConfig obtains configuration parameters from a
@@ -92,7 +93,6 @@ func RetrieveConfig() (cfg Config) {
 	}
 	return cfg
 }
-
 
 // readFromBucket reads file from a specified storage bucket.
 //

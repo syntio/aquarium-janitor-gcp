@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Package configuration handles extracting configuration parameters from a config file and environment variables.
 package configuration
 
@@ -72,16 +71,16 @@ type Config struct {
 		MaxThroughput       int           `yaml:"maxThroughput"`
 	} `yaml:"pullercleanercsv"`
 
-	PullerCleanerTaskQueue string      `yaml:"pullerCleanerTaskQueue"`
-	ContentType            string      `yaml:"contentType"`
-	FileMode               os.FileMode `yaml:"fileMode"`
-	FirebaseCollectionName string      `yaml:"firebaseCollectionName"`
+	PullerCleanerTaskQueue  string      `yaml:"pullerCleanerTaskQueue"`
+	ContentType             string      `yaml:"contentType"`
+	FileMode                os.FileMode `yaml:"fileMode"`
+	FirestoreCollectionName string      `yaml:"firestoreCollectionName"`
 }
 
-// RetrieveConfig obtains configuration parameters from a 
+// RetrieveConfig obtains configuration parameters from a
 // config file (which is in GCS bucket) into an object.
 //
-// Output parameters are a Config struct which will be filled 
+// Output parameters are a Config struct which will be filled
 // with configuration parameters, and a possible error occurred.
 func RetrieveConfig() (cfg Config, err error) {
 	bucketName := os.Getenv("BUCKET_NAME")
