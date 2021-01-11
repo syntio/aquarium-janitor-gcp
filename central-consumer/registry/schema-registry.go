@@ -21,13 +21,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/syntio/central-consumer/configuration"
 )
 
 var Cfg configuration.Config = configuration.RetrieveConfig()
-var schemaRegistryURL = Cfg.Functions.SchemaRegistryURL
+var schemaRegistryURL = os.Getenv("SCHEMA_REGISTRY_URL")
 
 // Schema represents a message schema from Schema Registry.
 type Schema struct {
@@ -51,7 +52,6 @@ type SchemaDetails struct {
 type Report struct {
 	Message string `json:"message"`
 }
-
 
 // GetSchemaByIDAndVersion retrieves a message schema from the Schema Registry using the schema ID and version.
 // HTTP is used as the method of communication with the Schema Registry service.

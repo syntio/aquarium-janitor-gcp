@@ -16,10 +16,12 @@
 package impl
 
 import (
+	"os"
+
 	"github.com/syntio/central-consumer/registry"
 )
 
-var csvValidatorURL = registry.Cfg.Functions.CsvValidatorURL
+var csvValidatorURL = os.Getenv("CSV_VALIDATOR_URL")
 var csvRequestContentType = registry.Cfg.ContentType
 
 // CsvValidator is a validator structure for CSV format.

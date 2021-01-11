@@ -16,10 +16,12 @@
 package impl
 
 import (
+	"os"
+
 	"github.com/syntio/central-consumer/registry"
 )
 
-var xmlValidatorURL = registry.Cfg.Functions.XmlValidatorURL
+var xmlValidatorURL = os.Getenv("XML_VALIDATOR_URL")
 var xmlRequestContentType = registry.Cfg.ContentType
 
 // XmlValidator is a validator structure for xml format.
