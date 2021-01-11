@@ -118,11 +118,7 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/schema-registry
 
 # Deploy the created image to Cloud Run
 echo "Deploying the created image to Cloud Run.."
-<<<<<<< HEAD
 gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --allow-unauthenticated --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,SERVICE_ACCOUNT_KEY_FILE=key.json
-=======
-gcloud run deploy schema-registry --image gcr.io/$PROJECT_ID/schema-registry --platform managed --allow-unauthenticated --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE,FIREBASE_CREDENTIALS_NAME=key.json
->>>>>>> f485cf60dc90e8265eabb780ed0aba5ad68e9507
 
 cd ..
 
@@ -144,16 +140,11 @@ echo $CSV_VALIDATOR_URL
 
 # Deploy the Central Consumer to Cloud Functions
 echo "Deploying the Central Consumer component.."
-<<<<<<< HEAD
 gcloud functions deploy central-consumer --runtime go113 --timeout=540s --allow-unauthenticated --entry-point CentralConsumerHandler --set-env-vars SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL,XML_VALIDATOR_URL=$XML_VALIDATOR_URL,CSV_VALIDATOR_URL=$CSV_VALIDATOR_URL --source=gs://$PROJECT_ID-$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
-=======
-gcloud functions deploy central-consumer --runtime go113 --timeout=540s --allow-unauthenticated --entry-point CentralConsumerHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/central-consumer.zip --trigger-topic $INPUT_TOPIC --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
->>>>>>> f485cf60dc90e8265eabb780ed0aba5ad68e9507
 
 EVOLUTION_PATH=/schema/%s/evolution
 # Deploy the Puller & Cleaner (JSON and CSV) to Cloud Functions
 echo "Deploying the Puller & Cleaner component.."
-<<<<<<< HEAD
 gcloud functions deploy puller-cleaner-json --runtime go113 --timeout=540s --allow-unauthenticated --entry-point PullerCleaner --set-env-vars SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL,EVOLUTION_PATH=$EVOLUTION_PATH   --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 gcloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --allow-unauthenticated --entry-point PullerCleaner --set-env-vars SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL,CSV_VALIDATOR_URL=$CSV_VALIDATOR_URL,EVOLUTION_PATH=$EVOLUTION_PATH  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
@@ -161,31 +152,13 @@ gcloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --allo
 echo "Getting puller&cleaner URLs"
 PULLER_CLEANER_JSON_URL=https://$REGION-$PROJECT_ID.cloudfunctions.net/puller-cleaner-json
 PULLER_CLEANER_CSV_URL=https://$REGION-$PROJECT_ID.cloudfunctions.net/puller-cleaner-csv
-=======
-gcloud functions deploy puller-cleaner-json --runtime go113 --timeout=540s --allow-unauthenticated --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
-
-gcloud functions deploy puller-cleaner-csv --runtime go113 --timeout=540s --allow-unauthenticated --entry-point PullerCleaner  --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-cleaner-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
->>>>>>> f485cf60dc90e8265eabb780ed0aba5ad68e9507
 
 # Deploy the function that creates Cloud Tasks to invoke Cloud Functions
 echo "Deploying the Puller Tasks functions.."
 
-<<<<<<< HEAD
 gcloud functions deploy puller-tasks-json --runtime go113 --timeout=540s --allow-unauthenticated --entry-point HTTPPullerTasks --set-env-vars PULLER_CLEANER_JSON_URL=$PULLER_CLEANER_JSON_URL --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
 
 gcloud functions deploy puller-tasks-csv --runtime go113 --timeout=540s --allow-unauthenticated --entry-point HTTPPullerTasks --set-env-vars PULLER_CLEANER_CSV_URL=$PULLER_CLEANER_CSV_URL --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
-=======
-gcloud functions deploy puller-tasks-json --runtime go113 --timeout=540s --allow-unauthenticated --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-json.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
-
-gcloud functions deploy puller-tasks-csv --runtime go113 --timeout=540s --allow-unauthenticated --entry-point HTTPPullerTasks --source=gs://$PROJECT_ID-$BUCKET_NAME/puller-tasks-csv.zip --trigger-http --region $REGION --set-env-vars PROJECT_ID=$PROJECT_ID,REGION=$REGION,BUCKET_NAME=$PROJECT_ID-$BUCKET_NAME,CONFIG_FILE=$CONFIG_FILE
-
-# Deploy the helper functions for XML and CSV validation
-echo "Deploying the helper Cloud Functions.."
-
-gcloud functions deploy xml-validator --runtime python37 --timeout=540s --allow-unauthenticated --entry-point http_validation_handler --source=gs://$PROJECT_ID-$BUCKET_NAME/xml-validator.zip --trigger-http --region $REGION
-
-gcloud functions deploy csv-validator --runtime java11 --timeout=540 --allow-unauthenticated --entry-point hr.syntio.handler.HttpHandler --source=gs://$PROJECT_ID-$BUCKET_NAME/csv-validator.zip --trigger-http --region $REGION
->>>>>>> f485cf60dc90e8265eabb780ed0aba5ad68e9507
 
 # Create Cloud Tasks queue
 echo "Creating Cloud Tasks Queue.."
