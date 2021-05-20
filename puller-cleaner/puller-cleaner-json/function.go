@@ -72,8 +72,6 @@ func init() {
 	maxBatchSize = Cfg.PullerCleanerJSON.MaxBatchSize
 	maxThroughput = Cfg.PullerCleanerJSON.MaxThroughput
 
-	schemaRegistryURL = Cfg.Functions.SchemaRegistryURL
-	schemaRegistryEvolutionURL = Cfg.Functions.SchemaRegistryEvolutionURL
 	contentType = Cfg.ContentType
 }
 
@@ -103,5 +101,5 @@ func PullerCleaner(w http.ResponseWriter, r *http.Request) {
 	cleaner.Clean(ctx, msgs, projectID, validTopic, invalidTopicCSV, deadLetterTopic,
 		schemaRegistryURL, schemaRegistryEvolutionURL, contentType)
 
-	fmt.Fprint(w, "Finished execution")
+	_, _ = fmt.Fprint(w, "Finished execution")
 }

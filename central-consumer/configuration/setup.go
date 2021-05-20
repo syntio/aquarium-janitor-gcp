@@ -45,15 +45,6 @@ type Config struct {
 		SubIdDeadletter string `yaml:"subIdDeadletter"`
 	} `yaml:"subscriptions"`
 
-	Functions struct {
-		SchemaRegistryURL          string `yaml:"schemaRegistryURL"`
-		CsvValidatorURL            string `yaml:"csvValidatorURL"`
-		XmlValidatorURL            string `yaml:"xmlValidatorURL"`
-		SchemaRegistryEvolutionURL string `yaml:"schemaRegistryEvolutionURL"`
-		PullerCleanerJsonURL       string `yaml:"pullerCleanerJsonURL"`
-		PullerCleanerCsvURL        string `yaml:"pullerCleanerCsvURL"`
-	} `yaml:"functions"`
-
 	Protoparam struct {
 		TmpFilePath string `yaml:"tmpFilePath"`
 		TmpFileName string `yaml:"tmpFileName"`
@@ -71,7 +62,7 @@ type Config struct {
 		MaxThroughput       int           `yaml:"maxThroughput"`
 	} `yaml:"pullercleanercsv"`
 
-	PullerCleanerTaskQueue  string      `yaml:"pullerCleanerTaskQueue"`
+	PullerTaskQueue         string      `yaml:"pullerTaskQueue"`
 	ContentType             string      `yaml:"contentType"`
 	FileMode                os.FileMode `yaml:"fileMode"`
 	FirestoreCollectionName string      `yaml:"firestoreCollectionName"`
@@ -116,7 +107,7 @@ func readFromBucket(bucketName string, fileName string) []byte {
 		return nil
 	}
 	slurp, err := ioutil.ReadAll(rc)
-	rc.Close()
+	_ = rc.Close()
 	if err != nil {
 		log.Printf("ERROR: Storage object is not valid. %v.\n", err)
 		return nil

@@ -45,15 +45,6 @@ type Config struct {
 		SubIdDeadletter string `yaml:"subIdDeadletter"`
 	} `yaml:"subscriptions"`
 
-	Functions struct {
-		SchemaRegistryURL          string `yaml:"schemaRegistryURL"`
-		CsvValidatorURL            string `yaml:"csvValidatorURL"`
-		XmlValidatorURL            string `yaml:"xmlValidatorURL"`
-		SchemaRegistryEvolutionURL string `yaml:"schemaRegistryEvolutionURL"`
-		PullerCleanerJsonURL       string `yaml:"pullerCleanerJsonURL"`
-		PullerCleanerCsvURL        string `yaml:"pullerCleanerCsvURL`
-	} `yaml:"functions"`
-
 	Protoparam struct {
 		TmpFilePath string `yaml:"tmpFilePath"`
 		TmpFileName string `yaml:"tmpFileName"`
@@ -71,10 +62,10 @@ type Config struct {
 		MaxThroughput       int           `yaml:"maxThroughput"`
 	} `yaml:"pullercleanercsv"`
 
-	PullerTaskQueue        string      `yaml:"pullerTaskQueue"`
-	ContentType            string      `yaml:"contentType"`
-	FileMode               os.FileMode `yaml:"fileMode"`
-	FirestoreCollectionName string      `yaml:"firestoreCollectionName`
+	PullerTaskQueue         string      `yaml:"pullerTaskQueue"`
+	ContentType             string      `yaml:"contentType"`
+	FileMode                os.FileMode `yaml:"fileMode"`
+	FirestoreCollectionName string      `yaml:"firestoreCollectionName"`
 }
 
 // RetrieveConfig obtains configuration parameters from a
@@ -121,7 +112,7 @@ func readFromBucket(bucketName string, fileName string) ([]byte, error) {
 	}
 
 	slurp, err := ioutil.ReadAll(rc)
-	rc.Close()
+	_ = rc.Close()
 	if err != nil {
 		return nil, fmt.Errorf("ERROR: Storage object is not valid. %v", err)
 	}

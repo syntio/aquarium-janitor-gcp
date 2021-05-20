@@ -7,7 +7,6 @@ require (
 	cloud.google.com/go/firestore v1.3.0
 	cloud.google.com/go/storage v1.12.0
 	github.com/gorilla/mux v1.8.0
-	go.mongodb.org/mongo-driver v1.4.2
 	golang.org/x/net v0.0.0-20200930145003-4acb6c075d10 // indirect
 	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f // indirect
 	golang.org/x/tools v0.0.0-20201002055958-0d28ed0cbe40 // indirect

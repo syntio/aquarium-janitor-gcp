@@ -44,14 +44,14 @@ type Config struct {
 		SubIdDeadletter string `yaml:"subIdDeadletter"`
 	} `yaml:"subscriptions"`
 
-	Functions struct {
+	/*Functions struct {
 		SchemaRegistryURL          string `yaml:"schemaRegistryURL"`
 		CsvValidatorURL            string `yaml:"csvValidatorURL"`
 		XmlValidatorURL            string `yaml:"xmlValidatorURL"`
 		SchemaRegistryEvolutionURL string `yaml:"schemaRegistryEvolutionURL"`
 		PullerCleanerJsonURL       string `yaml:"pullerCleanerJsonURL"`
 		PullerCleanerCsvURL        string `yaml:"pullerCleanerCsvURL"`
-	} `yaml:"functions"`
+	} `yaml:"functions"`*/
 
 	Protoparam struct {
 		TmpFilePath string `yaml:"tmpFilePath"`
@@ -106,7 +106,7 @@ func ReadFromBucket(bucketName string, fileName string) []byte {
 		return nil
 	}
 	slurp, err := ioutil.ReadAll(rc)
-	rc.Close()
+	_ = rc.Close()
 	if err != nil {
 		log.Printf("ERROR: Storage object is not valid. %v.\n", err)
 		return nil
