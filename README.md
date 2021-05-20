@@ -94,7 +94,7 @@ Janitor has the following components:
 ```
 
 ## Deployment and Configuration
-Instructions on how to configure your GCP project and deploy the GCP janitor can be found [here](../../wiki#2-deployment-and-configuration).
+Instructions on how to configure your GCP project and deploy the GCP janitor can be found [here](https://github.com/syntio/aquarium-janitor-gcp/wiki#deploy).
 
 ## Usage
 * Message schema registration
