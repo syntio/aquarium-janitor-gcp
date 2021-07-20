@@ -112,7 +112,7 @@ func readFromBucket(bucketName string, fileName string) ([]byte, error) {
 	}
 
 	slurp, err := ioutil.ReadAll(rc)
-	_ = rc.Close()
+	rc.Close()
 	if err != nil {
 		return nil, fmt.Errorf("ERROR: Storage object is not valid. %v", err)
 	}
