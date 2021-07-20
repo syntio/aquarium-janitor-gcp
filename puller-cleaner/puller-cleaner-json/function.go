@@ -101,5 +101,5 @@ func PullerCleaner(w http.ResponseWriter, r *http.Request) {
 	cleaner.Clean(ctx, msgs, projectID, validTopic, invalidTopicCSV, deadLetterTopic,
 		schemaRegistryURL, schemaRegistryEvolutionURL, contentType)
 
-	_, _ = fmt.Fprint(w, "Finished execution")
+	fmt.Fprint(w, "Finished execution")
 }
