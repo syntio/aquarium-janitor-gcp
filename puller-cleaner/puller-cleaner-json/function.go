@@ -72,8 +72,6 @@ func init() {
 	maxBatchSize = Cfg.PullerCleanerJSON.MaxBatchSize
 	maxThroughput = Cfg.PullerCleanerJSON.MaxThroughput
 
-	schemaRegistryURL = Cfg.Functions.SchemaRegistryURL
-	schemaRegistryEvolutionURL = Cfg.Functions.SchemaRegistryEvolutionURL
 	contentType = Cfg.ContentType
 }
 

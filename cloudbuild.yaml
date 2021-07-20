@@ -6,7 +6,7 @@ steps:
   env:
   -  'PROJECT_ID=$PROJECT_ID'
   -  'REGION=europe-west3'
-  -  'BUCKET_NAME=janitor'
+  -  'BUCKET_NAME=your-project-bkt-janitor'
   -  'CONFIG_FILE=config.yaml'
   timeout: 10000s
 timeout: 10000s

@@ -75,11 +75,8 @@ func init() {
 	maxBatchSize = Cfg.PullerCleanerCSV.MaxBatchSize
 	maxThroughput = Cfg.PullerCleanerCSV.MaxThroughput
 
-	schemaRegistryURL = Cfg.Functions.SchemaRegistryURL
-	schemaRegistryEvolutionURL = Cfg.Functions.SchemaRegistryEvolutionURL
 	contentType = Cfg.ContentType
 
-	csvValidatorURL = Cfg.Functions.CsvValidatorURL
 }
 
 // PullerCleaner is the main function.

@@ -42,7 +42,7 @@ func init() {
 //
 // The input arguments are the request context, a schemaId and a version of a schema.
 //
-// The output of this function is a marhsaled schema and a boolean which indicates if schema was found.
+// The output of this function is a marshalled schema and a boolean which indicates if schema was found.
 func GetSchema(ctx context.Context, schemaId string, version int32) ([]byte, bool) {
 	schemaInfo, found := databaseExecutor.GetSchemaByIdAndVersion(ctx, schemaId, version)
 	jsonResponse, err := json.Marshal(schemaInfo)
@@ -143,7 +143,7 @@ func UpdateSchema(ctx context.Context,
 
 }
 
-// ListSchemas invokes the databaseExecutor to retireve all schema versions of a specific schema document.
+// ListSchemas invokes the databaseExecutor to retrieve all schema versions of a specific schema document.
 //
 // The input arguments are the request context and schemaId.
 //
